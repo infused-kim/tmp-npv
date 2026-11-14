@@ -15,6 +15,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/events/split_peripheral_status_changed.h>
 #include "connection_status.h"
 #include "util.h"
+#include "split_central_status.h"
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
@@ -41,8 +42,11 @@ static void connection_status_update_cb(struct connection_status_state state) {
 }
 
 static struct connection_status_state connection_status_get_state(const zmk_event_t *eh) {
-    struct zmk_split_peripheral_status_changed *ev = as_zmk_split_peripheral_status_changed(eh);
-    return (struct connection_status_state){.connected = ev->connected};
+    // eh is NULL when the widget initializes
+    const struct zmk_split_peripheral_status_changed *ev =
+        (eh != NULL) ? as_zmk_split_peripheral_status_changed(eh) : NULL;
+    return (struct connection_status_state){
+        .connected = (ev != NULL) ? ev->connected : nice_peri_view_peripheral_connected()};
 }
 
 ZMK_DISPLAY_WIDGET_LISTENER(widget_connection_status, struct connection_status_state,

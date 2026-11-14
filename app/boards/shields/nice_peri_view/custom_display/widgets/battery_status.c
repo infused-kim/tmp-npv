@@ -23,6 +23,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include "battery_status.h"
 #include "util.h"
+#include "split_central_status.h"
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
@@ -107,11 +108,17 @@ void battery_status_update_cb(struct battery_state state) {
 
 static struct battery_state peripheral_battery_status_get_state(const zmk_event_t *eh) {
     const struct zmk_peripheral_battery_state_changed *ev =
-        as_zmk_peripheral_battery_state_changed(eh);
-    LOG_WRN("Peripheral Charge: %3u%%", ev->state_of_charge);
+        (eh != NULL) ? as_zmk_peripheral_battery_state_changed(eh) : NULL;
+    uint8_t level = 0;
+    if (ev != NULL) {
+        level = ev->state_of_charge;
+    } else {
+        zmk_split_central_get_peripheral_battery_level(0, &level);
+    }
+    LOG_DBG("Peripheral Charge: %3u%%", level);
     return (struct battery_state){
         .source = 1,
-        .level = ev->state_of_charge,
+        .level = level,
     };
 }
 
@@ -150,8 +157,11 @@ static void connection_status_update_cb(struct connection_status_state state) {
 }
 
 static struct connection_status_state connection_status_get_state(const zmk_event_t *eh) {
-    struct zmk_split_peripheral_status_changed *ev = as_zmk_split_peripheral_status_changed(eh);
-    return (struct connection_status_state){.connected = ev->connected};
+    // eh is NULL when the widget initializes
+    const struct zmk_split_peripheral_status_changed *ev =
+        (eh != NULL) ? as_zmk_split_peripheral_status_changed(eh) : NULL;
+    return (struct connection_status_state){
+        .connected = (ev != NULL) ? ev->connected : nice_peri_view_peripheral_connected()};
 }
 
 ZMK_DISPLAY_WIDGET_LISTENER(widget_battery_connection_status, struct connection_status_state,

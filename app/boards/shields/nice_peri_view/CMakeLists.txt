@@ -15,6 +15,7 @@ if(CONFIG_ZMK_DISPLAY AND CONFIG_ZMK_DISPLAY_STATUS_SCREEN_CUSTOM AND CONFIG_ZMK
     zephyr_library_sources(custom_display/widgets/layer_status.c)
     zephyr_library_sources(custom_display/widgets/output_status.c)
     zephyr_library_sources(custom_display/widgets/sleep_status.c)
+    zephyr_library_sources(custom_display/widgets/split_central_status.c)
     zephyr_library_sources(custom_display/widgets/sleep_status_art.c)
     zephyr_library_sources(custom_display/widgets/util.c)
 endif()

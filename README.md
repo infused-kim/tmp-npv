@@ -4,6 +4,8 @@ A ZMK module with alternative nice!view widgets for the central half of a split 
 
 It's a module version of the widgets by Tobias Arndt. You can find the [original version in his zmk-config](https://github.com/tobiasarndt/zmk-config).
 
+It also integrates the changes required to detect changes in the peripheral status that were originally added by ReFill in his [PR #2036](https://github.com/zmkfirmware/zmk/pull/2036) so that an unforked version of zmk can be used.
+
 <p align="middle">
 <img src="https://github.com/tobiasarndt/zmk-config/assets/54204861/53c7cc19-ce8d-4848-8c77-9eeaa39a5d66" height="400"/>
 <img src="https://github.com/tobiasarndt/zmk-config/assets/54204861/5a872f72-4adb-41ab-b733-b1440e55ae4e" height="400"/>
