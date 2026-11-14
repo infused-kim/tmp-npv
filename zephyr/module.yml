@@ -1,3 +1,4 @@
+name: nice-peri-view
 build:
   settings:
     dts_root: app/
