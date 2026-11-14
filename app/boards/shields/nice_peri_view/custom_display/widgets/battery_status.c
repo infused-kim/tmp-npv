@@ -19,7 +19,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/events/battery_state_changed.h>
 #include <zmk/events/split_peripheral_status_changed.h>
 #include <zmk/battery.h>
-#include <zmk/split/bluetooth/central.h>
+#include <zmk/split/central.h>
 
 #include "battery_status.h"
 #include "util.h"
@@ -137,7 +137,7 @@ static void set_connection(struct zmk_widget_batteries_status *widget,
                            struct connection_status_state state) {
     widget->connected = state.connected;
     uint8_t level;
-    zmk_split_get_peripheral_battery_level(0, &level);
+    zmk_split_central_get_peripheral_battery_level(0, &level);
     set_battery_symbol(widget, (struct battery_state){
                                    .source = 1,
                                    .level = level,
