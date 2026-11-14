@@ -1,60 +1,70 @@
 # Nice Peripheral View
 
-This is a zmk module version of the nice!view alternative widgets with peripheral status by Tobias Arndt.
+A ZMK module with alternative nice!view widgets for the central half of a split keyboard. They show the peripheral half's battery level and connection status on the central's display.
 
-You can find the [original version in his zmk-config](https://github.com/tobiasarndt/zmk-config).
+It's a module version of the widgets by Tobias Arndt. You can find the [original version in his zmk-config](https://github.com/tobiasarndt/zmk-config).
 
-## Custom Display
-
-It includes custom display code for a screen, which is displayed in sleep and rotated widgets and small pictogramms to display whether the peripheral half is connected.
 <p align="middle">
 <img src="https://github.com/tobiasarndt/zmk-config/assets/54204861/53c7cc19-ce8d-4848-8c77-9eeaa39a5d66" height="400"/>
 <img src="https://github.com/tobiasarndt/zmk-config/assets/54204861/5a872f72-4adb-41ab-b733-b1440e55ae4e" height="400"/>
 <img src="https://github.com/tobiasarndt/zmk-config/assets/54204861/2ab47ef1-7d45-4489-bb01-68d5bcdb517f" height="400"/>
 </p>
 
-## Setup Instructions
+The widgets include:
 
-This module is a drop-in replacement for the nice!view widgets. Make sure to get the regular nice!view widgets working first.
+- The peripheral's battery level next to the central's
+- Pictograms that show whether the peripheral half is connected
+- Output, BLE profile and layer status, rotated for the nice!view
+- Art on the sleep screen
 
-Please refer to the [nice!view documentation](https://nicekeyboards.com/docs/nice-view/getting-started), the [nice_view shield readme](https://github.com/zmkfirmware/zmk/tree/4dfc45d4ab38c23cae61dae4699bd0fbef4e33eb/app/boards/shields/nice_view), and the [nice_view_adapter shield](https://github.com/zmkfirmware/zmk/tree/4dfc45d4ab38c23cae61dae4699bd0fbef4e33eb/app/boards/shields/nice_view_adapter).
+## Compatibility
 
-Once your keyboard shows the nice!view widgets, you can switch to these widgets by making the following changes...
+The module's versions follow ZMK releases. Use the module revision that matches your ZMK version:
 
-### If you are building using GitHub Actions
+| ZMK version | Module revision |
+| ----------- | --------------- |
+| v0.3        | `v0.3`          |
+| v0.1, v0.2  | `v0.2`          |
 
-First adjust your `zmk-config/config/west.yml` to add the module and switch zmk to a fork that has [PR #2036](https://github.com/zmkfirmware/zmk/pull/2036).
+ZMK v0.3 moved the split central API, so `v0.3` of this module doesn't build with older ZMK versions, and older module versions don't build with ZMK v0.3.
+
+## Setup
+
+This module replaces the nice!view widgets on the central half. Make sure the regular nice!view works on your keyboard first. See the [nice!view documentation](https://nicekeyboards.com/docs/nice-view/getting-started) and ZMK's [nice_view shield](https://github.com/zmkfirmware/zmk/tree/v0.3/app/boards/shields/nice_view).
+
+### 1. Add the module to `config/west.yml`
+
+Add the remote and the project. Setting the revision under `defaults` keeps ZMK and the module on the same version:
 
 ```diff
 manifest:
++ defaults:
++   revision: v0.3 # ZMK release; modules use the same revision
++
   remotes:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
-+   - name: ReFil
-+     url-base: https://github.com/ReFil
-+   - name: tobiasarndt
-+     url-base: https://github.com/tobiasarndt
 +   - name: infused-kim
 +     url-base: https://github.com/infused-kim
 
   projects:
     - name: zmk
--      remote: zmkfirmware
--      revision: main
-+      remote: ReFil
-+      revision: split-data-xfer
+      remote: zmkfirmware
+-     revision: main
       import: app/west.yml
 +
-+   # zmk module for nice_peri_view
 +   - name: tmp-npv
 +     remote: infused-kim
-+     revision: main
 
   self:
     path: config
 ```
 
-Next, adjust your `zmk-config/build.yaml`. Make sure to add the `nice_peri_view` shield only do your central side (usually the left).
+If you pin ZMK explicitly instead, set `revision: v0.3` on both `zmk` and `tmp-npv`.
+
+### 2. Use the `nice_peri_view` shield on the central half
+
+In `build.yaml`, replace `nice_view` with `nice_peri_view` on the **central** half only. The peripheral half keeps the regular `nice_view`:
 
 ```diff
 include:
@@ -66,98 +76,58 @@ include:
     shield: corne_right nice_view
 ```
 
-If you get an error like...
+The central is usually the left half. If your central is the right half, use `nice_peri_view` on the right half instead and set `CONFIG_NICE_PERI_VIEW_RIGHT_SIDE_CENTRAL=y` (see below).
 
-```bash
-                 from /tmp/zmk-config/zmk/app/src/display/main.c:7:
-/tmp/zmk-config/zephyr/include/zephyr/device.h:85:41: error: '__device_dts_ord_DT_CHOSEN_zephyr_display_ORD' undeclared here (not in a function)
-```
+### 3. Build
 
-Then either make sure nice_view is enabled on your peripheral side or only enable `CONFIG_ZMK_DISPLAY=y` on the central side where the `nice_peri_view` shield is included.
+That's all. The shield enables everything it needs, so no extra config is required:
 
-You can use `zmk-config/config/your_keyboard_left.conf` and `zmk-config/config/your_keyboard_right.conf` to apply different settings to different sides.
+- the display (`CONFIG_ZMK_DISPLAY`) and the custom status screen
+- fetching the peripheral's battery level (`CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING`)
+- the LVGL fonts and widgets the screen uses
 
-Alternatively, you can also just remove `CONFIG_ZMK_DISPLAY` from your config as it will automatically be enabled when you include the nice_peri_view shield.
+It also turns off display blanking on idle (`CONFIG_ZMK_DISPLAY_BLANK_ON_IDLE=n`).
 
-### If you are building using the local toolchain (Developers only)
+## Configuration options
 
+Set these in your keyboard's `.conf` file, e.g. `config/corne.conf`. The values shown are the defaults:
 
-> **Notice**
->
-> This sub-section is for developers who are building zmk locally on their computers instead of using GitHub Actions. Most people can ignore this sub-section.
+```ini
+# Your central half is on the right
+CONFIG_NICE_PERI_VIEW_RIGHT_SIDE_CENTRAL=n
 
-#### Set up the toolchain <!-- omit from toc -->
-
-Follow the [toolchain setup instructions in the zmk documentation](https://zmk.dev/docs/development/setup).
-
-#### Add the zmk-config to the toolchain (docker only) <!-- omit from toc -->
-
-Create a volume with the directory where you will store the zmk-config:
-
-```bash
-docker volume create --driver local -o o=bind -o type=none -o device="/full/path/to/your/zmk-config/" zmk-config
-```
-
-#### Add this module to the toolchain (docker only) <!-- omit from toc -->
-
-At the time of publishing, the docker VSCode toolchain is not set up to work with modules yet.
-
-First, create a volume with the directory of your zmk-config:
-
-```bash
-docker volume create --driver local -o o=bind -o type=none -o device="/full/path/to/your/zmk-modules/" zmk-modules
-```
-
-Make sure this module is cloned into that `zmk-modules` directory.
-
-Next, edit in your zmk clone `zmk/.devcontainer/devcontainer.json`:
-
-```diff
-{
-  "name": "ZMK Development",
-  [...]
-  "mounts": [
-    "type=volume,source=zmk-root-user,target=/root",
-    "type=volume,source=zmk-config,target=/workspaces/zmk-config",
-+   "type=volume,source=zmk-modules,target=/workspaces/zmk-modules",
-    "type=volume,source=zmk-zephyr,target=${containerWorkspaceFolder}/zephyr",
-    "type=volume,source=zmk-zephyr-modules,target=${containerWorkspaceFolder}/modules",
-    "type=volume,source=zmk-zephyr-tools,target=${containerWorkspaceFolder}/tools"
-  ],
-  [...]
-}
-```
-
-Then, in VSCode press `Command + Shift + P` and execute the command `Dev Containers: Rebuild Without Cache and Reopen in Container`.
-
-Once the container is rebuilt, you can delete the above line from your `devcontainer.json` so that it doesn't pollute your git history. The container will continue mounting the `zmk-modules/` volume as long as you don't rebuild it.
-
-#### Build the firmware <!-- omit from toc -->
-
-Run the build command...
-
-```bash
-west build -d build/corne/right -p -b nice_nano_v2 -- -DZMK_EXTRA_MODULES="/workspaces/zmk-config/;/workspaces/zmk-modules/nice_peri_view/" -DZMK_CONFIG="/workspaces/zmk-config/config" -DSHIELD="corne_right nice_peri_view"
-```
-
-The important thing to note here is that you have to add the `/workspaces/zmk-config/` to your `-DZMK_EXTRA_MODULES` and use `;` as the separator between multiple modules.
-
-And `-DZMK_CONFIG` must include not just the path to the `zmk-config`, but also the sub-directory `zmk-config/config`.
-
-You can [learn more in the zmk dev documentation](https://zmk.dev/docs/development/build-flash#building-with-external-modules).
-
-## Configuration Options
-
-You can also adjust the following config options:
-
-```c
 # Rotate the display by 180 degrees
 CONFIG_NICE_PERI_VIEW_ROTATE_DISPLAY=n
 
-# If your central side is on the right, enable this option
-CONFIG_NICE_PERI_VIEW_RIGHT_SIDE_CENTRAL=n
+# Invert the display colors
+CONFIG_NICE_PERI_VIEW_SCREEN_INVERTED=n
 
-# Control when the sleep art should be shown
+# When to show the sleep art
 CONFIG_NICE_PERI_VIEW_SHOW_SLEEP_ART_ON_IDLE=y
 CONFIG_NICE_PERI_VIEW_SHOW_SLEEP_ART_ON_SLEEP=y
 ```
+
+## Troubleshooting
+
+### `__device_dts_ord_DT_CHOSEN_zephyr_display_ORD undeclared`
+
+```
+zephyr/include/zephyr/device.h:85:41: error: '__device_dts_ord_DT_CHOSEN_zephyr_display_ORD' undeclared here (not in a function)
+```
+
+`CONFIG_ZMK_DISPLAY=y` is enabled for a half that has no display. Either add `nice_view` to the peripheral half in `build.yaml`, or remove `CONFIG_ZMK_DISPLAY` from your config: the `nice_peri_view` shield enables it for the central anyway. To use different settings per half, put them in `config/<keyboard>_left.conf` and `config/<keyboard>_right.conf`.
+
+## Local builds
+
+When building locally with west and the module isn't in your `config/west.yml`, add it to `ZMK_EXTRA_MODULES`. Separate multiple modules with `;`:
+
+```bash
+west build -p -s zmk/app -b nice_nano_v2 -- \
+  -DZMK_CONFIG="/path/to/zmk-config/config" \
+  -DZMK_EXTRA_MODULES="/path/to/nice-peri-view" \
+  -DSHIELD="corne_left nice_peri_view"
+```
+
+If your zmk-config contains its own boards or shields (it has a `zephyr/module.yml`), add it to `ZMK_EXTRA_MODULES` as well, e.g. `"/path/to/zmk-config;/path/to/nice-peri-view"`.
+
+See ZMK's documentation on [setting up a local toolchain](https://zmk.dev/docs/development/local-toolchain/setup) and [building with external modules](https://zmk.dev/docs/development/local-toolchain/build-flash#building-with-external-modules).
