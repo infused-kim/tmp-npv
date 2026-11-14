@@ -18,7 +18,7 @@ config NICE_PERI_VIEW_SHOW_SLEEP_ART_ON_IDLE
         default y
 
 config NICE_PERI_VIEW_SHOW_SLEEP_ART_ON_SLEEP
-        bool "whether the sleep art should be shown on idle"
+        bool "whether the sleep art should be shown on sleep"
         default y
 
 if SHIELD_NICE_PERI_VIEW
