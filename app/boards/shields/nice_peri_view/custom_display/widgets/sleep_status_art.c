@@ -217,10 +217,9 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_SLEEPBERT
 #endif
 };
 
-const lv_img_dsc_t sleepbert = {
-    .header.cf = LV_IMG_CF_INDEXED_1BIT,
-    .header.always_zero = 0,
-    .header.reserved = 0,
+const lv_image_dsc_t sleepbert = {
+    .header.cf = LV_COLOR_FORMAT_I1,
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
     .header.w = 160,
     .header.h = 68,
     .data_size = 1368,

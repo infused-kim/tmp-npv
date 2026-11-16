@@ -43,6 +43,6 @@ config ZMK_WIDGET_WPM_STATUS
 config ZMK_WIDGET_SLEEP_STATUS
     bool "Widget for sleep screens"
     depends on !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
-    select LV_USE_IMG
+    select LV_USE_IMAGE
 
 endmenu

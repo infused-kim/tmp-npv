@@ -73,10 +73,9 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_KEYBOARD_
 #endif
 };
 
-const lv_img_dsc_t keyboard_pictogram_large = {
-    .header.cf = LV_IMG_CF_INDEXED_1BIT,
-    .header.always_zero = 0,
-    .header.reserved = 0,
+const lv_image_dsc_t keyboard_pictogram_large = {
+    .header.cf = LV_COLOR_FORMAT_I1,
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
     .header.w = 28,
     .header.h = 68,
     .data_size = 280,
@@ -120,10 +119,9 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_NOT_CONNE
 #endif
 };
 
-const lv_img_dsc_t not_connected_pictogram_large = {
-    .header.cf = LV_IMG_CF_INDEXED_1BIT,
-    .header.always_zero = 0,
-    .header.reserved = 0,
+const lv_image_dsc_t not_connected_pictogram_large = {
+    .header.cf = LV_COLOR_FORMAT_I1,
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
     .header.w = 29,
     .header.h = 33,
     .data_size = 140,
@@ -170,10 +168,9 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST
 #endif
 };
 
-const lv_img_dsc_t not_connected_pictogram_large_left = {
-    .header.cf = LV_IMG_CF_INDEXED_1BIT,
-    .header.always_zero = 0,
-    .header.reserved = 0,
+const lv_image_dsc_t not_connected_pictogram_large_left = {
+    .header.cf = LV_COLOR_FORMAT_I1,
+    .header.magic = LV_IMAGE_HEADER_MAGIC,
     .header.w = 29,
     .header.h = 33,
     .data_size = 140,

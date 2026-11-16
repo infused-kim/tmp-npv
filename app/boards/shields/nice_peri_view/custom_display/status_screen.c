@@ -9,6 +9,7 @@
 #include "widgets/sleep_status.h"
 #include "widgets/connection_status.h"
 #include "widgets/battery_status.h"
+#include "widgets/util.h"
 #include "status_screen.h"
 #include <zmk/events/activity_state_changed.h>
 #include <zmk/events/split_peripheral_status_changed.h>
@@ -35,6 +36,10 @@ static struct zmk_widget_wpm_status wpm_status_widget;
 lv_obj_t *zmk_display_status_screen() {
     lv_obj_t *screen;
     screen = lv_obj_create(NULL);
+    // LVGL 9 leaves the screen transparent when no theme is set, so areas that
+    // no widget covers would show the cleared buffer instead of the background.
+    lv_obj_set_style_bg_color(screen, LVGL_BACKGROUND, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(screen, LV_OPA_COVER, LV_PART_MAIN);
 
     zmk_widget_output_status_init(&output_status_widget, screen);
 

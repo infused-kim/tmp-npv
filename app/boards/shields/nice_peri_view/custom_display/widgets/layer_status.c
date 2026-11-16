@@ -38,11 +38,10 @@ static void set_layer_symbol(struct zmk_widget_layer_status *widget,
     }
 
     lv_canvas_set_buffer(widget->canvas, widget->cbuf, LAYER_CANVAS_WIDTH, LAYER_CANVAS_HEIGHT,
-                         LV_IMG_CF_TRUE_COLOR);
+                         CANVAS_COLOR_FORMAT);
     lv_canvas_fill_bg(widget->canvas, LVGL_BACKGROUND, LV_OPA_COVER);
-    lv_canvas_draw_text(widget->canvas, 0, 0, LAYER_CANVAS_WIDTH, &widget->layer_label_dsc,
-                        text);
-    rotate_canvas(widget->canvas, widget->cbuf, widget->cbuf_rot, LAYER_CANVAS_WIDTH, LAYER_CANVAS_HEIGHT);
+    canvas_draw_text(widget->canvas, 0, 0, LAYER_CANVAS_WIDTH, &widget->layer_label_dsc, text);
+    rotate_canvas(widget->canvas, widget->cbuf_rot, LAYER_CANVAS_WIDTH, LAYER_CANVAS_HEIGHT);
 }
 
 static void layer_status_update_cb(struct layer_status_state state)

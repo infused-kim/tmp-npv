@@ -31,7 +31,7 @@ struct output_status_state
 
 static struct output_status_state get_state(const zmk_event_t *_eh)
 {
-    return (struct output_status_state){.selected_endpoint = zmk_endpoints_selected(),
+    return (struct output_status_state){.selected_endpoint = zmk_endpoint_get_selected(),
                                         .active_profile_connected =
                                             zmk_ble_active_profile_is_connected(),
                                         .active_profile_bonded = !zmk_ble_active_profile_is_open()};
@@ -67,12 +67,14 @@ static void set_status_symbol(struct zmk_widget_output_status *widget, struct ou
                      state.selected_endpoint.ble.profile_index + 1);
         }
         break;
+    case ZMK_TRANSPORT_NONE:
+        break;
     }
     lv_canvas_set_buffer(widget->canvas, widget->cbuf, OUTPUT_CANVAS_WIDTH, OUTPUT_CANVAS_HEIGHT,
-                         LV_IMG_CF_TRUE_COLOR);
+                         CANVAS_COLOR_FORMAT);
     lv_canvas_fill_bg(widget->canvas, LVGL_BACKGROUND, LV_OPA_COVER);
-    lv_canvas_draw_text(widget->canvas, 0, 0, OUTPUT_CANVAS_WIDTH, &widget->output_label_dsc, text);
-    rotate_canvas(widget->canvas, widget->cbuf, widget->cbuf_rot, OUTPUT_CANVAS_WIDTH, OUTPUT_CANVAS_HEIGHT);
+    canvas_draw_text(widget->canvas, 0, 0, OUTPUT_CANVAS_WIDTH, &widget->output_label_dsc, text);
+    rotate_canvas(widget->canvas, widget->cbuf_rot, OUTPUT_CANVAS_WIDTH, OUTPUT_CANVAS_HEIGHT);
 }
 
 static void output_status_update_cb(struct output_status_state state)

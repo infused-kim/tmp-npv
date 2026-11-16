@@ -64,24 +64,23 @@ struct connection_status_state {
 
 static void draw_batteries_widget(struct zmk_widget_batteries_status *widget) {
     lv_canvas_set_buffer(widget->canvas, widget->cbuf, BATTERY_CANVAS_WIDTH, BATTERY_CANVAS_HEIGHT,
-                         LV_IMG_CF_TRUE_COLOR);
+                         CANVAS_COLOR_FORMAT);
 
     lv_canvas_fill_bg(widget->canvas, LVGL_BACKGROUND, LV_OPA_COVER);
     #if CONFIG_NICE_PERI_VIEW_RIGHT_SIDE_CENTRAL
-    lv_canvas_draw_text(widget->canvas, 35, 0, 33, &widget->central_label_dsc, widget->central_text);
+    canvas_draw_text(widget->canvas, 35, 0, 33, &widget->central_label_dsc, widget->central_text);
     if (widget->connected) {
-        lv_canvas_draw_text(widget->canvas, 0, 0, 33, &widget->peripheral_label_dsc,
-                            widget->peripheral_text);
+        canvas_draw_text(widget->canvas, 0, 0, 33, &widget->peripheral_label_dsc,
+                         widget->peripheral_text);
     }
     #else
-    lv_canvas_draw_text(widget->canvas, 0, 0, 33, &widget->central_label_dsc, widget->central_text);
+    canvas_draw_text(widget->canvas, 0, 0, 33, &widget->central_label_dsc, widget->central_text);
     if (widget->connected) {
-        lv_canvas_draw_text(widget->canvas, 35, 0, 33, &widget->peripheral_label_dsc,
-                            widget->peripheral_text);
+        canvas_draw_text(widget->canvas, 35, 0, 33, &widget->peripheral_label_dsc,
+                         widget->peripheral_text);
     }
     #endif
-    rotate_canvas(widget->canvas, widget->cbuf, widget->cbuf_rot, BATTERY_CANVAS_WIDTH,
-                  BATTERY_CANVAS_HEIGHT);
+    rotate_canvas(widget->canvas, widget->cbuf_rot, BATTERY_CANVAS_WIDTH, BATTERY_CANVAS_HEIGHT);
 }
 
 static void set_battery_symbol(struct zmk_widget_batteries_status *widget,
