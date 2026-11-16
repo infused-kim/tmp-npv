@@ -23,6 +23,9 @@ config NICE_PERI_VIEW_SHOW_SLEEP_ART_ON_SLEEP
 
 if SHIELD_NICE_PERI_VIEW
 
+    config LS0XX_VCOM_THREAD_PRIO
+        default 11
+
     config ZMK_DISPLAY
         select LV_FONT_MONTSERRAT_28
         select NICE_PERI_VIEW_CUSTOM_DISPLAY
